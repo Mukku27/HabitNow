@@ -1,4 +1,4 @@
-import { Habit } from "@/api/generated";
+// import type { Stats } from '@/api/generated'; // Removed due to TS2307 error
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import NumberTicker from "@/components/ui/number-ticker";
 

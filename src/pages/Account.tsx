@@ -48,7 +48,7 @@ interface UserData {
 }
 
 export default function Account() {
-  const { signOut, authenticatedFetch } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [userData, setUserData] = useState<UserData | null>(null);

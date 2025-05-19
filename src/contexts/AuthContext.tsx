@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { AuthService } from '../services/auth';
+// import AuthService from "../services/auth"; // Removed due to TS6133 error
 
 interface AuthContextType {
   isAuthenticated: boolean;

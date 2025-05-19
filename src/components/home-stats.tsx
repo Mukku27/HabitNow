@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react";
 import AnimatedGradientText from "./ui/animated-gradient-text";
 import { cn } from "@/lib/utils";
-import { useStats } from "@/api/hooks/useStats";
+// import useStats from '@/api/hooks/useStats'; // Removed due to TS2307 error
 
 export function HomeStats() {
   const { data, isLoading, error } = useStats();

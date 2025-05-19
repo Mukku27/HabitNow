@@ -1,4 +1,4 @@
-import { Habit } from "@/api/generated";
+// import type { Stats } from '@/api/generated'; // Removed due to TS2307 error
 import {
   Card,
   CardContent,

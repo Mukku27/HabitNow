@@ -1,5 +1,3 @@
-import { HabitType } from "@/api/types/appTypes";
-import { HabitStatsOutput } from "@/api/generated";
 import "cal-heatmap/cal-heatmap.css";
 import { AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";

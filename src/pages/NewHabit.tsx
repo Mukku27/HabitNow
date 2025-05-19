@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useHabits } from "../api/hooks/useHabits";
 import { Button } from "../components/ui/button";
 import {
   Card,

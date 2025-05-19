@@ -14,7 +14,7 @@ import CalHeatmapTooltip from "cal-heatmap/plugins/Tooltip";
 // @ts-expect-error - CalHeatmap is not typed
 import CalHeatmap from "cal-heatmap";
 import { useEffect } from "react";
-import { Habit } from "@/api/generated";
+// import type { BooleanHabit } from '@/api/generated'; // Removed due to TS2307 error
 import { useTheme } from "@/components/theme-provider";
 
 interface BooleanHeatmapProps {

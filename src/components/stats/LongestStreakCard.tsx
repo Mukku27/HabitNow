@@ -1,4 +1,3 @@
-import { Habit } from "@/api/generated";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import NumberTicker from "@/components/ui/number-ticker";
 

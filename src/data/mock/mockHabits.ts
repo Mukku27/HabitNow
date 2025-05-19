@@ -1,3 +1,4 @@
+// import type { Habit } from '@/api/types/appTypes'; // Removed due to TS2307 error
 import { HabitColor, HabitType } from "@/api/types/appTypes";
 
 // Helper to generate a year of completion data

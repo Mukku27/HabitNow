@@ -1,4 +1,4 @@
-import { StatsOutput } from "@/api/generated";
+// import type { Stats } from '@/api/generated'; // Removed due to TS2307 error
 
 export class StatsService {
   private static BASE_URL = import.meta.env.VITE_API_BASE_URL;

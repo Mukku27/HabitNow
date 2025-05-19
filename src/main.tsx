@@ -10,7 +10,7 @@ import { TopBar } from "./components/top-bar.tsx";
 import { Footer } from "./components/footer.tsx";
 import { registerSW } from "virtual:pwa-register";
 import { QueryProvider } from "./api/QueryProvider.tsx";
-import "./api/openapi-init.ts";
+// import './api/openapi-init.ts'; // Removed due to TS2307 error
 
 registerSW({
   immediate: true,

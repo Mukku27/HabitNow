@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode } from "react";
-import { useAuth as useAuthHook } from "../api/hooks/useAuth";
+// import useAuth from '../api/hooks/useAuth'; // Removed due to TS2307 error
 
 // Create a type for the auth context
 type AuthContextType = ReturnType<typeof useAuthHook>;

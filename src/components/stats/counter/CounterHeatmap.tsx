@@ -14,7 +14,8 @@ import CalHeatmapTooltip from "cal-heatmap/plugins/Tooltip";
 // @ts-expect-error - CalHeatmap is not typed
 import CalHeatmap from "cal-heatmap";
 import { useEffect } from "react";
-import { Habit } from "@/api/generated";
+// import type { CounterHabit } from '@/api/generated'; // Removed due to TS2307 error
+// import type { CounterHabitRecord } from '@/api/types/appTypes'; // Removed due to TS2307 error
 import { getColorRange, HabitColor } from "@/api/types/appTypes";
 
 interface CounterHeatmapProps {

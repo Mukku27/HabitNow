@@ -17,6 +17,8 @@ import JSConfetti from "js-confetti";
 import { useNavigate } from "react-router-dom";
 import { cn } from "../../lib/utils";
 import { playSuccessSound } from "../../lib/sound";
+// import type { BooleanHabit, User } from '@/api/generated'; // Removed due to TS2307 error
+// import type { UpdateBooleanHabitRequest } from '@/api/types/appTypes'; // Removed due to TS2307 error
 import { Habit } from "@/api/generated";
 import { ExtendedHabit } from "@/api/types/appTypes";
 
