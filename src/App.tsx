@@ -1,3 +1,4 @@
+import { useAuth } from "./providers/AuthProvider";
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { HabitList } from "./pages/HabitList";
@@ -11,8 +12,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 
 function App() {
-  // Simulate always authenticated for demo
-  const isAuthenticated = true;
+  const { isAuthenticated } = useAuth();
 
   if (isAuthenticated) {
     return (

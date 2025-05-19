@@ -1,11 +1,13 @@
+import { useAuth } from "../providers/AuthProvider";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 
 export function SignOutButton({ onSelect }: { onSelect: () => void }) {
+  const { signOut } = useAuth();
+
   const handleClick = () => {
     onSelect();
-    // Simulate sign out by navigating to the Auth page
-    window.location.href = "/auth";
+    signOut();
   };
 
   return (

@@ -17,7 +17,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,jsx,css,html,png,svg,json,webp,mp3}"],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/habitnow-production\.up\.railway\.app/g,
+            urlPattern: /^https:\/\/HabitNow-production\.up\.railway\.app/g,
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -37,9 +37,9 @@ export default defineConfig({
         "success.mp3",
       ],
       manifest: {
-        name: "habitnow",
+        name: "HabitNow",
         description: "A simple habit tracker",
-        short_name: "habitnow",
+        short_name: "HabitNow",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone",

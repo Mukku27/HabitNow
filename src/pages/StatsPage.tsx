@@ -1,9 +1,5 @@
-// Remove backend imports and define types locally
-const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
-
+import { HabitType } from "@/api/types/appTypes";
+import { HabitStatsOutput } from "@/api/generated";
 import "cal-heatmap/cal-heatmap.css";
 import { AlertCircle, ArrowLeft, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -21,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
 import { Button } from "../components/ui/button";
+import { useHabits } from "../api/hooks/useHabits";
 import "./StatsPage.css";
 import { useToast } from "../hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -34,46 +31,66 @@ import {
   MonthlyOverviewChart,
 } from "@/components/stats";
 
-// Mock habit and stats data
-const mockHabit = {
-  _id: "demo-habit",
-  name: "Demo Habit",
-  color: "#3498db",
-  type: HabitType.BOOLEAN,
-  completedDates: {},
-  currentStreak: 5,
-  longestStreak: 10,
-  completionRate7Days: 80,
-  completionRateMonth: 75,
-  completionRateYear: 60,
-};
-const mockStats = {
-  currentStreak: 5,
-  longestStreak: 10,
-  completionRate7Days: 80,
-  completionRateMonth: 75,
-  completionRateYear: 60,
-};
-
 export function StatsPage() {
   const { habitId } = useParams();
+  const { habits, deleteHabit, refreshHabits, getStats } = useHabits();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
-  const [habitTitle, setHabitTitle] = useState(mockHabit.name);
-  const [habitStats, setHabitStats] = useState(mockStats);
-  const [isLoadingStats, setIsLoadingStats] = useState(false);
-  const { toast } = useToast();
 
-  // Simulate finding the habit by ID (always returns mockHabit for demo)
-  const habit = mockHabit;
+  const habit = habits.find((h) => h._id === habitId);
+  const [isEditing, setIsEditing] = useState(false);
+  const [habitTitle, setHabitTitle] = useState("");
+  const [habitStats, setHabitStats] = useState<HabitStatsOutput | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+
+  const { toast } = useToast();
+  const updateHabit = useHabits().updateHabit;
+
+  useEffect(() => {
+    // Fetch habits data when component mounts
+    refreshHabits();
+    // Using empty dependency array to run only once on mount
+  }, []);
+
+  useEffect(() => {
+    // Fetch stats for the specific habit when habitId changes
+    const fetchHabitStats = async () => {
+      if (habitId) {
+        try {
+          setIsLoadingStats(true);
+          const stats = await getStats(habitId);
+          setHabitStats(stats);
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch habit statistics",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoadingStats(false);
+        }
+      }
+    };
+
+    fetchHabitStats();
+  }, [habitId, getStats, toast]);
 
   const handleEditClick = async () => {
     setIsEditing(!isEditing);
+
     if (isEditing) {
-      toast({
-        title: "Habit Modified",
-        description: "New habit title saved successfully",
-      });
+      try {
+        updateHabit(habit!._id, { name: habitTitle });
+        toast({
+          title: "Habit Modified",
+          description: "New habit title saved successfully",
+        });
+      } catch {
+        toast({
+          title: "Error",
+          description: "Failed to update habit title",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -81,7 +98,25 @@ export function StatsPage() {
     setHabitTitle(e.target.value);
   };
 
-  if (!habit) return null;
+  useEffect(() => {
+    if (habit) {
+      setHabitTitle(habit.name);
+    }
+  }, [habit, habit?._id]);
+
+  if (!habit) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        <div className="flex justify-center">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>Habit not found</AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoadingStats) {
     return (
@@ -107,7 +142,7 @@ export function StatsPage() {
     );
   }
 
-  // Use stats from the mock if available, otherwise fall back to the habit object
+  // Use stats from the API if available, otherwise fall back to the habit object
   const currentStreak = habitStats?.currentStreak ?? habit.currentStreak ?? 0;
   const longestStreak = habitStats?.longestStreak ?? habit.longestStreak ?? 0;
   const completionRate7Days = habitStats?.completionRate7Days ?? 0;
@@ -160,7 +195,7 @@ export function StatsPage() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={async () => {
-                    // Simulate delete and navigate home
+                    await deleteHabit(habit._id);
                     navigate("/");
                   }}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -175,26 +210,41 @@ export function StatsPage() {
           </Button>
         </div>
       </div>
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <div className="md:block grid grid-cols-1 gap-8">
+        <Heatmap habit={habit} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <Calendar habit={habit} />
         <CurrentStreakCard habit={habit} currentStreak={currentStreak} />
         <LongestStreakCard habit={habit} longestStreak={longestStreak} />
+
         <CompletionRateCard
           habit={habit}
           completionRate={completionRate7Days}
           title="Completion Rate"
           description="Last 7 days"
         />
+
+        <CompletionRateCard
+          habit={habit}
+          completionRate={completionRateMonth}
+          title="Monthly Rate"
+          description="This month (completed days only)"
+        />
+
+        <CompletionRateCard
+          habit={habit}
+          completionRate={completionRateYear}
+          title="Yearly Rate"
+          description="This year (completed days only)"
+        />
       </div>
-      {/* Overview Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <YearlyOverviewChart habit={habit} />
         <MonthlyOverviewChart habit={habit} />
-      </div>
-      {/* Heatmap and Calendar */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Heatmap habit={habit} />
-        <Calendar habit={habit} />
       </div>
     </div>
   );

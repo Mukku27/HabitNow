@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,8 +20,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useNavigate } from "react-router-dom";
 
 export function Auth() {
+  const { signIn, signUp } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
@@ -30,12 +33,22 @@ export function Auth() {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+
+    try {
+      if (isSignUp) {
+        // @ts-expect-error plausible is added by the script tag
+        window.plausible("signup");
+        await signUp(email, password);
+      } else {
+        // @ts-expect-error plausible is added by the script tag
+        window.plausible("signin");
+        await signIn(email, password);
+      }
+
       toast({
         title: isSignUp ? "Account created" : "Welcome back",
         description: isSignUp
@@ -44,23 +57,47 @@ export function Auth() {
       });
       setEmail("");
       setPassword("");
-      setIsLoading(false);
       navigate("/");
-    }, 800);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsForgotPasswordLoading(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users/forgot-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: forgotPasswordEmail }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to send reset email");
+      }
+
       toast({
         title: "Reset email sent",
         description: "Check your email for password reset instructions.",
       });
       setShowForgotPassword(false);
       setForgotPasswordEmail("");
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to send reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsForgotPasswordLoading(false);
-    }, 800);
+    }
   };
 
   return (

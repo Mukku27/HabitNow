@@ -8,6 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
+import { useAuth } from "@/providers/AuthProvider";
 import { ModeToggle } from "./mode-toggle";
 import { FeedbackButton } from "./feedback-button";
 import { useState } from "react";
@@ -16,8 +17,7 @@ import { AccountSettingsButton } from "./account-settings-button";
 import { Link } from "react-router-dom";
 
 export function TopBar() {
-  // Simulate always authenticated for demo
-  const [isAuthenticated] = useState(true);
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
 
   const menuItems = (
@@ -59,7 +59,7 @@ export function TopBar() {
                 className="rounded-full h-10 w-10"
                 onClick={() =>
                   window.open(
-                    "https://github.com/Mukku27/HabitNow.git",
+                    "https://github.com/fberrez/HabitNow-web",
                     "_blank"
                   )
                 }

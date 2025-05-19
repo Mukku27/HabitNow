@@ -1,4 +1,4 @@
-#HabitNow
+# HabitNow
 
 A minimalist habit tracking application built with React that helps users build and maintain daily habits through simple, visual tracking.
 
@@ -31,11 +31,13 @@ A minimalist habit tracking application built with React that helps users build 
 ## Getting Started
 
 ```bash
-git clone https://github.com/Mukku27/HabitNow.git
-cd HabitNow 
+git clone https://github.com/fberrez/HabitNow-web.git
+cd HabitNow
 pnpm install
 pnpm run dev
 ```
+
+API available at https://github.com/fberrez/HabitNow
 
 ## Project Structure
 
@@ -50,6 +52,7 @@ src/
 ├── pages/ # Main application pages
 │ ├── HabitList.tsx
 │ └── StatsPage.tsx
+└── services/ # API service layer
 └── habits.ts
 ```
 

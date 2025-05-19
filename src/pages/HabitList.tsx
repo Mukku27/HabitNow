@@ -1,39 +1,25 @@
 import { useRef, useEffect, useState } from "react";
+import { useHabits } from "../api/hooks/useHabits";
 import { Card, CardContent } from "../components/ui/card";
 import { Skeleton } from "../components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import JSConfetti from "js-confetti";
+import { HabitType } from "../api/types/appTypes";
 import { BooleanHabitCard } from "../components/habits/boolean-habit-card";
 import { CounterHabitCard } from "../components/habits/counter-habit-card";
 import { AddNewButtons } from "../components/add-new-buttons";
-
-// Mock habit types and data
-const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
-
-const mockHabits = [
-  {
-    _id: "1",
-    name: "Read for 5 minutes",
-    type: HabitType.BOOLEAN,
-    color: "blue",
-    completedDates: {},
-  },
-  {
-    _id: "2",
-    name: "Drink 8 glasses of water",
-    type: HabitType.COUNTER,
-    color: "green",
-    completedDates: {},
-    targetCounter: 8,
-  },
-];
+import { Habit } from "@/api/generated";
 
 export function HabitList() {
-  const [habits, setHabits] = useState(mockHabits);
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    habits,
+    isLoading,
+    trackHabit: trackHabitApi,
+    untrackHabit: untrackHabitApi,
+    incrementHabit: incrementHabitApi,
+    decrementHabit: decrementHabitApi,
+    refreshHabits,
+  } = useHabits();
   const navigate = useNavigate();
   const jsConfettiRef = useRef<JSConfetti | null>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -41,66 +27,45 @@ export function HabitList() {
     Record<string, Record<string, number>>
   >({});
 
-  // Simulate habit actions as local state updates
+  // Create wrapper functions that return void
   const trackHabit = async (habitId: string, date: string): Promise<void> => {
-    setLocalCompletionStatus((prev) => ({
-      ...prev,
-      [habitId]: { ...(prev[habitId] || {}), [date]: 1 },
-    }));
+    await trackHabitApi(habitId, date);
   };
 
   const untrackHabit = async (habitId: string, date: string): Promise<void> => {
-    setLocalCompletionStatus((prev) => {
-      const updated = { ...(prev[habitId] || {}) };
-      delete updated[date];
-      return { ...prev, [habitId]: updated };
-    });
+    await untrackHabitApi(habitId, date);
   };
 
-  const incrementHabit = async (habitId: string, date: string): Promise<void> => {
-    setLocalCompletionStatus((prev) => ({
-      ...prev,
-      [habitId]: {
-        ...(prev[habitId] || {}),
-        [date]: ((prev[habitId]?.[date] || 0) + 1),
-      },
-    }));
+  const incrementHabit = async (
+    habitId: string,
+    date: string
+  ): Promise<void> => {
+    await incrementHabitApi(habitId, date);
   };
 
-  const decrementHabit = async (habitId: string, date: string): Promise<void> => {
-    setLocalCompletionStatus((prev) => {
-      const current = prev[habitId]?.[date] || 0;
-      return {
-        ...prev,
-        [habitId]: {
-          ...(prev[habitId] || {}),
-          [date]: Math.max(0, current - 1),
-        },
-      };
-    });
+  const decrementHabit = async (
+    habitId: string,
+    date: string
+  ): Promise<void> => {
+    await decrementHabitApi(habitId, date);
   };
 
   useEffect(() => {
     jsConfettiRef.current = new JSConfetti();
+
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
+
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
-    // Initialize localCompletionStatus for each habit
-    setLocalCompletionStatus((prev) => {
-      const updated = { ...prev };
-      habits.forEach((habit) => {
-        if (!updated[habit._id]) {
-          updated[habit._id] = { ...habit.completedDates };
-        }
-      });
-      return updated;
-    });
-  }, [habits]);
+    // Fetch habits data when component mounts
+    refreshHabits();
+    // Using empty dependency array to run only once on mount
+  }, []);
 
   const getLast5Days = () => {
     const dates = [];
@@ -156,14 +121,22 @@ export function HabitList() {
         </div>
         <div className="space-y-4 habit-list">
           {/* Regular Habits Section */}
-          {habits.map((habit) => {
+          {(habits as Habit[]).map((habit) => {
+            if (!localCompletionStatus[habit._id]) {
+              setLocalCompletionStatus((prev) => ({
+                ...prev,
+                [habit._id]: { ...habit.completedDates },
+              }));
+            }
+
             const commonProps = {
-              habit: { ...habit, completedDates: localCompletionStatus[habit._id] || {} },
+              habit,
               localCompletionStatus,
               setLocalCompletionStatus,
               jsConfettiRef,
-              onClick: () => navigate(`/stats/${habit._id}`),
+              onClick: () => navigate("/HabitList"),
             };
+
             switch (habit.type) {
               case HabitType.BOOLEAN:
                 return (

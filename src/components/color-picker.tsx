@@ -2,22 +2,11 @@ import { Check } from "lucide-react";
 
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-
-// Define HabitColor locally
-export const HabitColor = {
-  BLUE: "blue",
-  GREEN: "green",
-  RED: "red",
-  YELLOW: "yellow",
-  PURPLE: "purple",
-  ORANGE: "orange",
-};
-
-type HabitColorType = (typeof HabitColor)[keyof typeof HabitColor];
+import { HabitColor } from "@/api/types/appTypes";
 
 interface ColorPickerProps {
-  value: HabitColorType;
-  onChange: (value: HabitColorType) => void;
+  value: HabitColor;
+  onChange: (value: HabitColor) => void;
   disabled?: boolean;
 }
 

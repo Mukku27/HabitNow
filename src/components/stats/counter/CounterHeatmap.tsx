@@ -14,27 +14,11 @@ import CalHeatmapTooltip from "cal-heatmap/plugins/Tooltip";
 // @ts-expect-error - CalHeatmap is not typed
 import CalHeatmap from "cal-heatmap";
 import { useEffect } from "react";
-// import { Habit } from "@/api/generated"; // Remove if not needed
-// Define HabitColor and getColorRange locally
-const HabitColor = {
-  BLUE: "blue",
-  GREEN: "green",
-  RED: "red",
-  YELLOW: "yellow",
-  PURPLE: "purple",
-  ORANGE: "orange",
-};
-const getColorRange: Record<string, string[]> = {
-  blue: ["#e3f0ff", "#90c2ff", "#4098ff", "#005ecb", "#003366"],
-  green: ["#e6f9e6", "#a8e6a3", "#4dd784", "#00a65a", "#006633"],
-  red: ["#ffeaea", "#ffb3b3", "#ff6666", "#e60000", "#990000"],
-  yellow: ["#fffbe6", "#fff1a8", "#ffe066", "#ffd700", "#bfa600"],
-  purple: ["#f3e6ff", "#d1a8ff", "#b266ff", "#8000ff", "#4b0066"],
-  orange: ["#fff3e6", "#ffd1a8", "#ffb266", "#ff8000", "#b34700"],
-};
+import { Habit } from "@/api/generated";
+import { getColorRange, HabitColor } from "@/api/types/appTypes";
 
 interface CounterHeatmapProps {
-  readonly habit: any; // Use 'any' or define a local Habit type if needed
+  readonly habit: Habit;
 }
 
 export default function CounterHeatmap({ habit }: CounterHeatmapProps) {
@@ -79,7 +63,7 @@ export default function CounterHeatmap({ habit }: CounterHeatmapProps) {
         },
         scale: {
           color: {
-            range: getColorRange[habit.color as keyof typeof getColorRange],
+            range: getColorRange[habit.color as HabitColor],
             type: "threshold",
             domain: [
               0.25 * habit.targetCounter,

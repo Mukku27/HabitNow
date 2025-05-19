@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useHabits } from "../api/hooks/useHabits";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -12,24 +13,11 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { useToast } from "../hooks/use-toast";
+import { HabitColor, HabitType } from "../api/types/appTypes";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Alert, AlertDescription } from "../components/ui/alert";
 import { Lightbulb } from "lucide-react";
 import { ColorPicker } from "../components/color-picker";
-
-const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
-
-const HabitColor = {
-  BLUE: "blue",
-  GREEN: "green",
-  RED: "red",
-  YELLOW: "yellow",
-  PURPLE: "purple",
-  ORANGE: "orange",
-};
 
 const habitSuggestions = [
   "Read for 5 minutes",
@@ -50,15 +38,17 @@ const getRandomColor = () => {
 
 export function NewHabit() {
   const [name, setName] = useState("");
-  const [color, setColor] = useState(getRandomColor());
-  const [type, setType] = useState(HabitType.BOOLEAN);
-  const [targetCounter, setTargetCounter] = useState(1);
+  const [color, setColor] = useState<HabitColor>(getRandomColor());
+  const [type, setType] = useState<HabitType>(HabitType.BOOLEAN);
+  const [targetCounter, setTargetCounter] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
+  const { createHabit } = useHabits();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!name.trim() || !color) {
       toast({
         title: "Missing required fields",
@@ -67,6 +57,7 @@ export function NewHabit() {
       });
       return;
     }
+
     if (type === HabitType.COUNTER && (!targetCounter || targetCounter <= 0)) {
       toast({
         title: "Invalid target counter",
@@ -78,26 +69,30 @@ export function NewHabit() {
       });
       return;
     }
+
     setIsLoading(true);
-    setTimeout(() => {
-      // Store new habit in localStorage for demo (or window)
-      const newHabit = {
-        _id: Date.now().toString(),
+
+    try {
+      await createHabit(
         name,
         color,
         type,
-        completedDates: {},
-        ...(type === HabitType.COUNTER ? { targetCounter } : {}),
-      };
-      const existing = JSON.parse(localStorage.getItem("habits") || "[]");
-      localStorage.setItem("habits", JSON.stringify([...existing, newHabit]));
+        type === HabitType.COUNTER ? targetCounter : undefined
+      );
       toast({
         title: "Habit created",
         description: "Your new habit has been created successfully.",
       });
-      setIsLoading(false);
       navigate("/");
-    }, 800);
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to create habit. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
@@ -160,7 +155,7 @@ export function NewHabit() {
               <Label>Type</Label>
               <RadioGroup
                 value={type}
-                onValueChange={(value) => setType(value)}
+                onValueChange={(value: HabitType) => setType(value)}
                 className="grid grid-cols-2 gap-4"
               >
                 <div className="flex items-center space-x-2">
@@ -198,15 +193,24 @@ export function NewHabit() {
 
             <ColorPicker
               value={color}
-              onChange={(value) => setColor(value)}
+              onChange={(value: HabitColor) => setColor(value)}
               disabled={isLoading}
             />
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating..." : "Create Habit"}
-            </Button>
           </form>
         </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/")}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading} onClick={handleSubmit}>
+            {isLoading ? "Creating..." : "Create Habit"}
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

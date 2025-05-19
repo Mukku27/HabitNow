@@ -23,7 +23,7 @@ export default function TermsOfUse() {
                   Acceptance of Terms
                 </h2>
                 <p>
-                  By accessing or using habitnow, you agree to be bound by
+                  By accessing or using HabitNow, you agree to be bound by
                   these Terms of Use. If you do not agree to these terms, please
                   do not use our service.
                 </p>
@@ -34,7 +34,7 @@ export default function TermsOfUse() {
                   Description of Service
                 </h2>
                 <p>
-                  habitnow is a minimalist habit tracking application that
+                  HabitNow is a minimalist habit tracking application that
                   allows users to create, track, and maintain daily habits. The
                   service includes features such as:
                 </p>
@@ -89,7 +89,7 @@ export default function TermsOfUse() {
                 </h2>
                 <p>
                   The service and its original content, features, and
-                  functionality are owned by habitnow and are protected by
+                  functionality are owned by HabitNow and are protected by
                   international copyright, trademark, and other intellectual
                   property laws.
                 </p>
@@ -122,7 +122,7 @@ export default function TermsOfUse() {
                   Limitation of Liability
                 </h2>
                 <p>
-                  To the fullest extent permitted by law, habitnow shall not
+                  To the fullest extent permitted by law, HabitNow shall not
                   be liable for any indirect, incidental, special,
                   consequential, or punitive damages resulting from your use of
                   the service.

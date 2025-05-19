@@ -1,17 +1,10 @@
 import { Loader2 } from "lucide-react";
 import AnimatedGradientText from "./ui/animated-gradient-text";
 import { cn } from "@/lib/utils";
+import { useStats } from "@/api/hooks/useStats";
 
 export function HomeStats() {
-  // Use static/mock data for demo
-  const isLoading = false;
-  const error = false;
-  const data = {
-    usersCount: 1234,
-    stats: {
-      totalCompleted: 5678,
-    },
-  };
+  const { data, isLoading, error } = useStats();
 
   if (error) {
     return null; // Return nothing if there's an error

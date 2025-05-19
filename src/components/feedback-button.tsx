@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 export function FeedbackButton() {
   const handleClick = () => {
     window.location.href =
-      'mailto:vemulapallimukesh@gmail.com?subject=HabitNow%20Feedback';
+      'mailto:contact@fberrez.co?subject=HabitNow%20Feedback';
   };
 
   return (

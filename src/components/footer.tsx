@@ -13,10 +13,10 @@ export function Footer() {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          <span>© {new Date().getFullYear()} habitnow</span>
+          <span>© {new Date().getFullYear()} HabitNow</span>
           <span>·</span>
           <a
-            href="https://github.com/fberrez/habitnow"
+            href="https://github.com/fberrez/HabitNow"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline"
@@ -25,7 +25,7 @@ export function Footer() {
           </a>
           <span>·</span>
           <a
-            href="https://reddit.com/r/habitnow"
+            href="https://reddit.com/r/HabitNow"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:underline"

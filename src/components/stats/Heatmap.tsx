@@ -1,15 +1,10 @@
-// Define HabitType locally
-const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
-
+import { HabitType } from "@/api/types/appTypes";
 import CounterHeatmap from "./counter/CounterHeatmap";
 import BooleanHeatmap from "./boolean/BooleanHeatmap";
-// import { Habit } from "@/api/generated"; // Remove if not needed
+import { Habit } from "@/api/generated";
 
 interface HeatmapProps {
-  readonly habit: any; // Use 'any' or define a local Habit type if needed
+  readonly habit: Habit;
 }
 
 export default function Heatmap({ habit }: HeatmapProps) {

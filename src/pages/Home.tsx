@@ -5,34 +5,7 @@ import { BooleanHabitCard } from "@/components/habits/boolean-habit-card";
 import { CounterHabitCard } from "@/components/habits/counter-habit-card";
 import { useEffect, useRef, useState } from "react";
 import JSConfetti from "js-confetti";
-// Define HabitColor, HabitType, and ExtendedHabit locally
-export const HabitColor = {
-  BLUE: "blue",
-  GREEN: "green",
-  RED: "red",
-  YELLOW: "yellow",
-  PURPLE: "purple",
-  ORANGE: "orange",
-};
-export const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
-export interface ExtendedHabit {
-  _id: string;
-  name: string;
-  color: string;
-  type: string;
-  completedDates: Record<string, number>;
-  targetCounter: number;
-  createdAt: string;
-  userId: string;
-  currentStreak: number;
-  longestStreak: number;
-  completionRate7Days: number;
-  completionRateMonth: number;
-  completionRateYear: number;
-}
+import { HabitColor, HabitType, ExtendedHabit } from "../api/types/appTypes";
 import moment from "moment";
 import { Card, CardContent } from "../components/ui/card";
 import { AddNewButtons } from "@/components/add-new-buttons";
@@ -45,9 +18,11 @@ import {
   LongestStreakCard,
 } from "@/components/stats";
 import CounterHeatmap from "@/components/stats/counter/CounterHeatmap";
+import { useAuth } from "../providers/AuthProvider";
 
 export function Home() {
   const navigate = useNavigate();
+  const { signInAsDemo } = useAuth();
   const jsConfettiRef = useRef<JSConfetti>(new JSConfetti());
   const [currentCard, setCurrentCard] = useState<"boolean" | "counter">(
     "boolean"
@@ -509,7 +484,7 @@ export function Home() {
               <div className="relative">
                 <HomeStats />
                 <h1 className="text-6xl font-bold mb-4 tracking-tighter">
-                  habitnow.
+                  HabitNow.
                 </h1>
                 <p className="text-lg text-gray-600 max-w-md mx-auto md:mx-0">
                   Track your habits and build lasting habits
@@ -518,7 +493,10 @@ export function Home() {
               <div className="flex flex-col items-center md:items-start">
                 <Button
                   size="lg"
-                  onClick={() => navigate("/auth")}
+                  onClick={() => {
+                    signInAsDemo();
+                    navigate("/HabitList");
+                  }}
                   className="relative"
                 >
                   Get Started
@@ -823,7 +801,10 @@ export function Home() {
               <Button
                 size="lg"
                 className="text-lg px-8"
-                onClick={() => navigate("/auth")}
+                onClick={() => {
+                  signInAsDemo();
+                  navigate("/HabitList");
+                }}
               >
                 Get Started for Free
               </Button>

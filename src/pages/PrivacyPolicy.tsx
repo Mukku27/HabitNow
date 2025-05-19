@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
               <section>
                 <h2 className="text-xl font-semibold mb-2">Introduction</h2>
                 <p>
-                  This Privacy Policy explains how habitnow ("we", "us", or
+                  This Privacy Policy explains how HabitNow ("we", "us", or
                   "our") collects, uses, and protects your personal information
                   when you use our habit tracking application.
                 </p>

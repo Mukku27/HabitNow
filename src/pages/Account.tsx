@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,6 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { mockUser } from "@/data/mock/mockUser";
 
 interface AccountState {
   showEmailDialog: boolean;
@@ -46,10 +48,11 @@ interface UserData {
 }
 
 export default function Account() {
+  const { signOut, authenticatedFetch } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [userData, setUserData] = useState<UserData>({ email: "demo@habitnow.com" });
-  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [state, setState] = useState<AccountState>({
     showEmailDialog: false,
     showPasswordDialog: false,
@@ -59,6 +62,16 @@ export default function Account() {
     currentPassword: "",
     newPassword: "",
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      // Simulate async fetch
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setUserData({ email: mockUser.email });
+      setIsPageLoading(false);
+    };
+    fetchUserData();
+  }, []);
 
   const resetState = () => {
     setState((prev) => ({
@@ -76,38 +89,36 @@ export default function Account() {
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, isLoading: true }));
-    setTimeout(() => {
-      setUserData({ email: state.newEmail });
-      toast({
-        title: "Email updated",
-        description: "Your email has been successfully updated.",
-      });
-      resetState();
-    }, 800);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    setUserData({ email: state.newEmail });
+    toast({
+      title: "Email updated",
+      description: "Your email has been successfully updated.",
+    });
+    resetState();
   };
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setState((prev) => ({ ...prev, isLoading: true }));
-    setTimeout(() => {
-      toast({
-        title: "Password updated",
-        description: "Your password has been successfully updated.",
-      });
-      resetState();
-    }, 800);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    toast({
+      title: "Password updated",
+      description: "Your password has been successfully updated.",
+    });
+    resetState();
   };
 
   const handleDeleteAccount = async () => {
     setState((prev) => ({ ...prev, isLoading: true }));
-    setTimeout(() => {
-      navigate("/auth");
-      toast({
-        title: "Account deleted",
-        description: "Your account has been permanently deleted.",
-      });
-      resetState();
-    }, 800);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await signOut();
+    navigate("/auth");
+    toast({
+      title: "Account deleted",
+      description: "Your account has been permanently deleted.",
+    });
+    resetState();
   };
 
   const renderEmailDialog = () => (
@@ -224,7 +235,9 @@ export default function Account() {
                 type="password"
                 autoComplete="new-password"
                 value={state.newPassword}
-                onChange={(e) => setState((prev) => ({ ...prev, newPassword: e.target.value }))}
+                onChange={(e) =>
+                  setState((prev) => ({ ...prev, newPassword: e.target.value }))
+                }
                 disabled={state.isLoading}
                 required
                 tabIndex={2}
@@ -288,17 +301,14 @@ export default function Account() {
           </div>
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel
-            onClick={() =>
-              setState((prev) => ({ ...prev, showDeleteDialog: false }))
-            }
-            disabled={state.isLoading}
-          >
+          <AlertDialogCancel disabled={state.isLoading} tabIndex={3}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeleteAccount}
-            disabled={state.isLoading}
+            disabled={state.isLoading || !state.currentPassword}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            tabIndex={2}
           >
             {state.isLoading ? "Deleting..." : "Delete Account"}
           </AlertDialogAction>
@@ -307,67 +317,115 @@ export default function Account() {
     </AlertDialog>
   );
 
-  if (isPageLoading) {
+  if (state.isLoading || isPageLoading) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <Skeleton className="h-32 w-full mb-4" />
-        <Skeleton className="h-12 w-1/2 mb-2" />
-        <Skeleton className="h-12 w-1/3" />
+      <div className="flex items-center justify-center">
+        <div className="w-full max-w-5xl p-4">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-72" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 w-24" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-10 flex-1" />
+                  <Skeleton className="h-10 w-24" />
+                </div>
+              </div>
+              <div className="pt-6">
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Account</CardTitle>
-          <CardDescription>Manage your account settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <Label>Email</Label>
-            <div className="flex items-center gap-4 mt-2">
-              <span className="font-medium">{userData.email}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setState((prev) => ({ ...prev, showEmailDialog: true }))}
-              >
-                Change Email
-              </Button>
+    <div className="flex items-center justify-center">
+      <div className="w-full max-w-2xl p-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Settings</CardTitle>
+            <CardDescription>
+              Manage your account settings and preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  value={userData?.email || ""}
+                  disabled
+                  className="flex-1"
+                  tabIndex={-1}
+                />
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setState((prev) => ({ ...prev, showEmailDialog: true }))
+                  }
+                  disabled={state.isLoading}
+                  tabIndex={1}
+                >
+                  Change
+                </Button>
+              </div>
             </div>
-          </div>
-          <div>
-            <Label>Password</Label>
-            <div className="flex items-center gap-4 mt-2">
-              <span className="font-medium">********</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setState((prev) => ({ ...prev, showPasswordDialog: true }))}
-              >
-                Change Password
-              </Button>
+
+            <div className="space-y-2">
+              <Label>Password</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  type="password"
+                  value="••••••••"
+                  disabled
+                  className="flex-1"
+                  tabIndex={-1}
+                />
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setState((prev) => ({ ...prev, showPasswordDialog: true }))
+                  }
+                  disabled={state.isLoading}
+                  tabIndex={2}
+                >
+                  Change
+                </Button>
+              </div>
             </div>
-          </div>
-          <div>
-            <Label>Danger Zone</Label>
-            <div className="flex items-center gap-4 mt-2">
+
+            <div className="pt-6">
               <Button
                 variant="destructive"
-                size="sm"
-                onClick={() => setState((prev) => ({ ...prev, showDeleteDialog: true }))}
+                onClick={() =>
+                  setState((prev) => ({ ...prev, showDeleteDialog: true }))
+                }
+                disabled={state.isLoading}
+                tabIndex={3}
               >
                 Delete Account
               </Button>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      {renderEmailDialog()}
-      {renderPasswordDialog()}
-      {renderDeleteDialog()}
+          </CardContent>
+        </Card>
+
+        {renderEmailDialog()}
+        {renderPasswordDialog()}
+        {renderDeleteDialog()}
+      </div>
     </div>
   );
 }

@@ -79,13 +79,13 @@ define(['./workbox-31ad9288'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
-    "revision": "0.fnm3cb9md9o"
+    "revision": "0.lepq9mp069"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
-  workbox.registerRoute(/^https:\/\/habitnow-production\.up\.railway\.app/g, new workbox.NetworkFirst({
+  workbox.registerRoute(/^https:\/\/minihabits-production\.up\.railway\.app/g, new workbox.NetworkFirst({
     "cacheName": "api-cache",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 50,

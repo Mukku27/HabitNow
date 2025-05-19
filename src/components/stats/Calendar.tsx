@@ -1,20 +1,20 @@
 import { Card, CardContent } from "@/components/ui/card";
-// Define HabitType locally
-const HabitType = {
-  BOOLEAN: "BOOLEAN",
-  COUNTER: "COUNTER",
-};
+
+import { useHabits } from "@/api/hooks/useHabits";
+import { HabitType } from "@/api/types/appTypes";
 import { isAfter, format } from "date-fns";
 import { startOfDay } from "date-fns";
 import { useState, useEffect } from "react";
 import { DayPicker } from "react-day-picker";
-// import { Habit } from "@/api/generated"; // Remove if not needed
+import { Habit } from "@/api/generated";
 
 interface CalendarProps {
-  readonly habit: any; // Use 'any' or define a local Habit type if needed
+  readonly habit: Habit;
 }
 
 export default function Calendar({ habit }: CalendarProps) {
+  const { trackHabit, untrackHabit, refreshHabits } = useHabits();
+
   const [localCompletionStatus, setLocalCompletionStatus] = useState(
     habit.completedDates
   );
@@ -41,10 +41,26 @@ export default function Calendar({ habit }: CalendarProps) {
     const isCompleted = localCompletionStatus[formattedDate] > 0;
 
     // Optimistically update UI
-    setLocalCompletionStatus((prev: any) => ({
+    setLocalCompletionStatus((prev) => ({
       ...prev,
       [formattedDate]: isCompleted ? 0 : 1,
     }));
+
+    try {
+      if (isCompleted) {
+        await untrackHabit(habit._id, formattedDate);
+      } else {
+        await trackHabit(habit._id, formattedDate);
+      }
+      // Refresh habits data to get the updated completedDates
+      await refreshHabits();
+    } catch {
+      // Revert local state on error
+      setLocalCompletionStatus((prev) => ({
+        ...prev,
+        [formattedDate]: isCompleted ? 1 : 0,
+      }));
+    }
   };
 
   return (
